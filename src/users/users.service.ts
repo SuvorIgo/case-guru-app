@@ -15,4 +15,8 @@ export class UsersService {
   async getUserByLogin(payload: AuthorizationUserDto): Promise<Users> {
     return await this.usersRepository.getUserByLogin(payload);
   }
+
+  async checkApiToken(apiToken: string): Promise<boolean> {
+    return await this.usersRepository.checkApiToken(apiToken);
+  }
 }

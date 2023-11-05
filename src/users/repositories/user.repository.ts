@@ -27,19 +27,19 @@ export class UsersRepository extends Repository<Users> {
 
     const hashPassword = await hashingPassword(payload.password);
 
-    const resultPayload = {
-      login: payload.login,
-      fio: payload.fio,
+    const apiToken = await this.jwtService.signAsync({
+      ...payload,
       password: hashPassword,
-      apiToken: await this.jwtService.signAsync({
-        password: hashPassword,
-        ...payload,
-      }),
+    });
+    console.log(apiToken);
+
+    await this.save({ ...payload, password: hashPassword, apiToken: apiToken });
+
+    return {
+      ...payload,
+      password: hashPassword,
+      apiToken: apiToken,
     };
-
-    await this.save(resultPayload);
-
-    return resultPayload;
   }
 
   public async getUserByLogin(
@@ -62,6 +62,12 @@ export class UsersRepository extends Repository<Users> {
       };
 
     return await this.findOne({ where: { login: payload.login } });
+  }
+
+  public async checkApiToken(apiToken: string): Promise<boolean> {
+    const user = await this.findOne({ where: { apiToken: apiToken } });
+
+    return !user ? false : true;
   }
 
   private async checkLogin(
