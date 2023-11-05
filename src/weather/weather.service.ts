@@ -4,10 +4,14 @@ import { UsersService } from 'src/users/users.service';
 import axios, { AxiosResponse } from 'axios';
 import { GetCurrentWeatherResponseType } from './response-types/get-current-weather.type';
 import { ExceptionType } from 'src/types/exceptions/exception.type';
+import { ActionsService } from 'src/actions/actions.service';
 
 @Injectable()
 export class WeatherService {
-  constructor(private readonly usersService: UsersService) {}
+  constructor(
+    private readonly usersService: UsersService,
+    private readonly actionsService: ActionsService,
+  ) {}
 
   async getCurrentWeather(
     payload: GetCurrentWeatherDto,
@@ -21,9 +25,13 @@ export class WeatherService {
 
       const resWeather: AxiosResponse = await axios.get(url);
 
+      console.log(resWeather);
+
+      await this.actionsService.pushDatabase(resWeather.data);
+
       return resWeather.data;
     } catch (error) {
-      console.log(error.statusCode);
+      console.log(error);
     }
   }
 }

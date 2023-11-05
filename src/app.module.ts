@@ -5,6 +5,8 @@ import { UsersModule } from './users/users.module';
 import { Users } from './users/entities/users.entity';
 import { WeatherModule } from './weather/weather.module';
 import { ConfigModule } from '@nestjs/config';
+import { ActionsModule } from './actions/actions.module';
+import { MongooseModule } from '@nestjs/mongoose';
 
 @Module({
   imports: [
@@ -20,12 +22,18 @@ import { ConfigModule } from '@nestjs/config';
         synchronize: true,
       }),
     }),
+    MongooseModule.forRootAsync({
+      useFactory: () => ({
+        uri: `${process.env.MONGODB_DIALECT}://${process.env.MONGODB_HOST}/${process.env.MONGODB_NAMEDATABASE}`,
+      }),
+    }),
     ConfigModule.forRoot({
       isGlobal: true,
     }),
     AuthModule,
     UsersModule,
     WeatherModule,
+    ActionsModule,
   ],
   controllers: [],
   providers: [],
